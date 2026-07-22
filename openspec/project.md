@@ -52,3 +52,8 @@ Brain dump → AI парсить текст → створює задачі → 
 5. Фінальна перевірка і полірування (демо, Loom)
 
 Кожен крок з роадмапу оформлюється як окремий change у `openspec/changes/`.
+
+## Completed Steps
+1. **Інфраструктура і спека** (`step1-infra-and-spec`) — Next.js + Tailwind + shadcn/ui,
+   репозиторій підключено до Vercel, `openspec/specs/task-domain/spec.md`, `types.ts`,
+   `storage.ts`, публічний Vercel URL перевірено.
