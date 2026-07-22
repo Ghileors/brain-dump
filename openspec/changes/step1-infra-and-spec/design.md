@@ -3,6 +3,8 @@
 ## Repo & Deploy
 - GitHub repo → підключення до Vercel через Git-інтеграцію (автодеплой на push у `main`).
 - Preview-деплої на кожен PR/бранч — зручно перевіряти наступні кроки ізольовано.
+- Vercel Authentication (deployment protection) має бути вимкнена для Production —
+  інакше `/` веде на Vercel SSO login, а не на застосунок.
 
 ## Project Structure (Next.js App Router)
 ```
