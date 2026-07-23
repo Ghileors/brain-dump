@@ -63,3 +63,9 @@ Brain dump → AI парсить текст → створює задачі → 
    збереженням; Inbox і Today списки на `lib/storage.ts`, дія перенесення задачі з Inbox
    у Today; `openspec/specs/ai-task-capture/spec.md`, `openspec/specs/inbox-today-board/spec.md`.
    Гілку змерджено в `dev`.
+3. **Голосовий ввід** (`step3-voice-input`) — кнопка мікрофона поруч із текстовим полем,
+   диктовка через нативний Web Speech API (`SpeechRecognition` /
+   `webkitSpeechRecognition`) пише розпізнаний текст у те саме поле, що й ручний ввід;
+   без нового API-роуту й без нових залежностей. Задачі позначаються `source: 'voice'`
+   або `'text'` залежно від способу вводу; graceful fallback у браузерах без підтримки.
+   `openspec/specs/ai-task-capture/spec.md` оновлено (delta синхронізовано).
