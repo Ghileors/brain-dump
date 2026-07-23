@@ -12,4 +12,3 @@
 - Ветку шага чекаутить от `dev` (не от `master`), PR из неё делать в `dev`.
 - После тестирования на `dev` создаётся отдельный PR из `dev` в `master`.
 - При архивировании change (`openspec/changes/<slug>` → `openspec/changes/archive/`) обновлять версию приложения в `package.json` (semver).
-
