@@ -7,8 +7,10 @@
 - Перед добавлением новой npm-зависимости — сообщить пользователю, зачем она нужна.
 
 ## Workflow Rules
-- Каждый шаг (proposal) из `openspec/changes/` начинается с создания новой git-ветки
-  (например `step2-<slug>`); вся реализация этого шага делается в этой ветке, не в `master`.
+- Перед тем как начинать описывать proposal (т.е. до `/opsx:propose` / `openspec new change`
+  и до создания любых файлов в `openspec/changes/`), сначала сделать
+  `git checkout -b step<N>-<slug>` от `dev`. Спека и вся реализация этого шага
+  делаются в этой ветке, не в `dev` и не в `master`.
 - Ветку шага чекаутить от `dev` (не от `master`), PR из неё делать в `dev`.
 - После тестирования на `dev` создаётся отдельный PR из `dev` в `master`.
 - При архивировании change (`openspec/changes/<slug>` → `openspec/changes/archive/`) обновлять версию приложения в `package.json` (semver).
