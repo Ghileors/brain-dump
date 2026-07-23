@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import packageJson from "@/package.json";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { loadTasks, saveTasks } from "@/lib/storage";
-import type { Task, TaskPriority } from "@/lib/types";
+import type { Task, TaskPriority, TaskSource } from "@/lib/types";
 
 interface CandidateTask {
   title: string;
@@ -13,12 +13,48 @@ interface CandidateTask {
   dueDate: string | null;
 }
 
+interface SpeechRecognitionEventLike extends Event {
+  results: SpeechRecognitionResultList;
+}
+
+interface SpeechRecognitionErrorEventLike extends Event {
+  error: string;
+}
+
+interface SpeechRecognitionLike extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  start: () => void;
+  stop: () => void;
+  onresult: ((event: SpeechRecognitionEventLike) => void) | null;
+  onerror: ((event: SpeechRecognitionErrorEventLike) => void) | null;
+  onend: (() => void) | null;
+}
+
+interface SpeechRecognitionConstructor {
+  new (): SpeechRecognitionLike;
+}
+
+function getSpeechRecognitionConstructor(): SpeechRecognitionConstructor | null {
+  if (typeof window === "undefined") return null;
+  const w = window as unknown as {
+    SpeechRecognition?: SpeechRecognitionConstructor;
+    webkitSpeechRecognition?: SpeechRecognitionConstructor;
+  };
+  return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
+}
+
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [text, setText] = useState("");
+  const [source, setSource] = useState<TaskSource>("text");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [noTasksFound, setNoTasksFound] = useState(false);
+  const [speechSupported, setSpeechSupported] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [voiceError, setVoiceError] = useState<string | null>(null);
+  const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
 
   useEffect(() => {
     // localStorage is unavailable during SSR, so tasks must be hydrated
@@ -27,6 +63,51 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setTasks(loadTasks());
   }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSpeechSupported(getSpeechRecognitionConstructor() !== null);
+  }, []);
+
+  function toggleListening() {
+    if (isListening) {
+      recognitionRef.current?.stop();
+      return;
+    }
+
+    const SpeechRecognitionCtor = getSpeechRecognitionConstructor();
+    if (!SpeechRecognitionCtor) return;
+
+    const recognition = new SpeechRecognitionCtor();
+    recognition.continuous = false;
+    recognition.interimResults = true;
+
+    recognition.onresult = (event) => {
+      const transcript = Array.from(event.results)
+        .map((result) => result[0]?.transcript ?? "")
+        .join("");
+      setSource("voice");
+      setText(transcript);
+    };
+
+    recognition.onerror = (event) => {
+      setVoiceError(
+        event.error === "not-allowed"
+          ? "Microphone permission was denied."
+          : "Couldn't capture speech. Please try again.",
+      );
+      setIsListening(false);
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    recognitionRef.current = recognition;
+    setVoiceError(null);
+    setIsListening(true);
+    recognition.start();
+  }
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -63,13 +144,14 @@ export default function Home() {
         dueDate: candidate.dueDate,
         scheduledTime: null,
         status: "inbox",
-        source: "text",
+        source,
       }));
 
       const updated = [...tasks, ...newTasks];
       setTasks(updated);
       saveTasks(updated);
       setText("");
+      setSource("text");
     } catch {
       setError("Couldn't reach the server. Please try again.");
     } finally {
@@ -100,14 +182,34 @@ export default function Home() {
       <form onSubmit={handleSubmit} className="flex flex-col gap-2">
         <Textarea
           value={text}
-          onChange={(event) => setText(event.target.value)}
+          onChange={(event) => {
+            setSource("text");
+            setText(event.target.value);
+          }}
           placeholder="Dump everything on your mind..."
           disabled={isSubmitting}
           rows={4}
         />
-        <Button type="submit" disabled={isSubmitting || !text.trim()}>
-          {isSubmitting ? "Parsing..." : "Capture"}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            type="submit"
+            disabled={isSubmitting || !text.trim()}
+            className="flex-1"
+          >
+            {isSubmitting ? "Parsing..." : "Capture"}
+          </Button>
+          {speechSupported && (
+            <Button
+              type="button"
+              variant={isListening ? "destructive" : "outline"}
+              disabled={isSubmitting}
+              onClick={toggleListening}
+            >
+              {isListening ? "Listening..." : "Speak"}
+            </Button>
+          )}
+        </div>
+        {voiceError && <p className="text-sm text-destructive">{voiceError}</p>}
         {error && <p className="text-sm text-destructive">{error}</p>}
         {noTasksFound && (
           <p className="text-sm text-muted-foreground">
