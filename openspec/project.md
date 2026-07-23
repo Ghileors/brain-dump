@@ -57,3 +57,9 @@ Brain dump → AI парсить текст → створює задачі → 
 1. **Інфраструктура і спека** (`step1-infra-and-spec`) — Next.js + Tailwind + shadcn/ui,
    репозиторій підключено до Vercel, `openspec/specs/task-domain/spec.md`, `types.ts`,
    `storage.ts`, публічний Vercel URL перевірено.
+2. **Core-сценарій наскрізь** (`step2-core-capture-flow`) — текстовий brain dump на
+   головній сторінці, `app/api/parse/route.ts` парсить текст через `claude-haiku-4-5`
+   (Anthropic API, ключ тільки в `process.env` на сервері), відповідь валідується перед
+   збереженням; Inbox і Today списки на `lib/storage.ts`, дія перенесення задачі з Inbox
+   у Today; `openspec/specs/ai-task-capture/spec.md`, `openspec/specs/inbox-today-board/spec.md`.
+   Гілку змерджено в `dev`.
