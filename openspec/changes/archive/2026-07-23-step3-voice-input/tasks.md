@@ -40,13 +40,13 @@
 
 ## 6. Verification
 
-- [ ] 6.1 Manually test in a supported browser (Chrome/Edge): dictate text, verify it
+- [x] 6.1 Manually test in a supported browser (Chrome/Edge): dictate text, verify it
       appears in the textarea, submit, and confirm the created task has
       `source: 'voice'` in `localStorage`.
-- [ ] 6.2 Manually test editing a dictated transcript by typing before submit, and
+- [x] 6.2 Manually test editing a dictated transcript by typing before submit, and
       confirm the resulting task has `source: 'text'`.
-- [ ] 6.3 Manually verify the mic button does not render (or app still works via
+- [x] 6.3 Manually verify the mic button does not render (or app still works via
       typing) in a browser without Web Speech API support, or via feature-detection
       override.
-- [ ] 6.4 Manually test denying microphone permission and confirm an error message
+- [x] 6.4 Manually test denying microphone permission and confirm an error message
       appears and no request is sent.
