@@ -38,4 +38,4 @@
 - [x] 5.3 Manual test: submit text with no actionable tasks, confirm "no tasks found" message and no storage mutation
 - [x] 5.4 Manual test: temporarily break the API key/env to confirm error path doesn't corrupt stored tasks
 - [x] 5.5 Run `npx tsc --noEmit` and `npm run lint`
-- [ ] 5.6 Push branch, open PR into `dev`, verify Vercel preview deploy works end-to-end
+- [x] 5.6 Push branch, open PR into `dev`, verify Vercel preview deploy works end-to-end
